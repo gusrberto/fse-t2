@@ -19,6 +19,13 @@ timer = None
 
 def main():
     try:
+        # Executa a calibração e verifica se foi bem-sucedida
+        if not calibrate_system():
+            print("Calibração falhou. Encerrando o sistema...")
+            close()
+            return
+
+        # Inicia a rotina principal
         routine()
 
         while running:
@@ -28,6 +35,7 @@ def main():
         close()
     except KeyboardInterrupt:
         close()
+
 
 def routine():
     global current_speed, timer
@@ -60,6 +68,51 @@ def routine():
     if running:
         timer = threading.Timer(sampling_period, routine)
         timer.start()
+
+def calibrate_system():
+    print("Iniciando calibração do sistema...")
+    success = True
+
+    try:
+        # Teste do motor
+        print("Testando Sensor_hall_motor...")
+        engine.moveEngine(50)
+        time.sleep(2)
+        motor_rpm = hall_sensors.get_engine_rpm()
+        engine.moveEngine(0)
+        if motor_rpm > 0:
+            print(f"Sensor_hall_motor funcionando: RPM = {motor_rpm:.2f}")
+        else:
+            print("Erro: Nenhum sinal no Sensor_hall_motor!")
+            success = False
+
+        # Teste das rodas
+        print("Testando sensores de roda...")
+        engine.moveEngine(30)
+        time.sleep(3)
+        wheel_speed = hall_sensors.get_wheel_speed()
+        engine.moveEngine(0)
+        if wheel_speed != 0:
+            print(f"Sensores de roda funcionando: Velocidade = {wheel_speed:.2f} km/h")
+        else:
+            print("Erro: Nenhum sinal dos sensores de roda!")
+            success = False
+
+        # Verificação dos pedais
+        print("Testando pedais...")
+        if not (pedals.read_accelerator() or pedals.read_brake()):
+            print("Erro: Nenhum sinal dos pedais!")
+            success = False
+        else:
+            print("Pedais funcionando corretamente.")
+
+    except Exception as e:
+        print(f"Erro durante a calibração: {e}")
+        success = False
+
+    print("Calibração concluída.")
+    return success
+
 
 def close():
     global running, timer
