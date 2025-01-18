@@ -34,6 +34,7 @@ class Engine():
     def moveEngine(self, value):
         value = max(-100, min(100, value))
         self.setDutyCycle(abs(value))
+        print(f"Setting PWM Duty Cycle: {abs(value)}%")
         if value < 0:
             self.accelerate_reverse()
         elif value > 0:
