@@ -4,9 +4,6 @@ from src.modules.hall_sensors import HallSensors
 from src.modules.pedals import Pedals
 import time
 import threading
-import RPi.GPIO as GPIO 
-
-GPIO.setmode(GPIO.BCM)
 
 # Inicializando modulos
 engine = Engine()
@@ -17,63 +14,51 @@ hall_sensors = HallSensors()
 encerrar = threading.Event()
 
 # Tempo de loop
-sampling_period = 0.5
+sampling_period = 0.2
 
 running = True
 
-current_speed = 0
-
 def main():
     try:
-        routine()  # Inicia a rotina principal
-        while not encerrar.is_set():
-            time.sleep(1)  # Reduz a ocupação da CPU
+        routine()
+
+        while running:
+            time.sleep(1)
+    except Exception:
+        close()
     except KeyboardInterrupt:
-        print("Encerrando pelo usuário...")
-    except Exception as e:
-        print(f"Erro inesperado: {e}")
-    finally:
         close()
 
 def routine():
-    global current_speed
+    # Get reference speed from pedals
+    reference_speed = pedals.calculate_reference_speed()
 
-    try:
-        # Obter a velocidade de referência dos pedais
-        reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
+    # Update the PID controller with the new reference speed
+    pid.refresh_reference(reference_speed)
 
-        # Atualizar o controlador PID com a nova velocidade de referência
-        pid.refresh_reference(reference_speed)
+    # Read the current wheel speed from the sensors
+    measured_speed = hall_sensors.get_wheel_speed()
 
-        # Ler a velocidade atual da roda pelos sensores
-        measured_speed = hall_sensors.get_wheel_speed()
+    # Calculate the control signal using PID
+    control_signal = pid.controller(measured_speed)
 
-        # Calcular o sinal de controle usando PID
-        control_signal = pid.controller(measured_speed)
+    # Apply the control signal to the engine
+    engine.moveEngine(control_signal)
 
-        # Aplicar o sinal de controle ao motor
-        engine.moveEngine(control_signal)
+    # Log the current state for debugging
+    print(f"Reference Speed: {reference_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, Control Signal: {control_signal:.2f}")
 
-        # Log para depuração
-        print(f"Reference Speed: {reference_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, Control Signal: {control_signal:.2f}")
-        print(f"Current Speed: {current_speed:.2f} km/h")
-        current_speed = measured_speed
-
-    except Exception as e:
-        print(f"Erro na rotina: {e}")
-        close()
-        return
-
-    # Reagendar a execução do controle após o tempo de amostragem
-    if not encerrar.is_set():
+    # Re-agendar a execução do controle após o tempo de amostragem
+    if running:
         threading.Timer(sampling_period, routine).start()
 
-
 def close():
-    encerrar.set()  # Sinaliza para parar o agendamento
+    global running
+    running = False
+    encerrar.set()
     engine.moveEngine(0)
     hall_sensors.stop()
-    pedals.stop()
+    time.sleep(1)
     print('Sistema encerrado')
 
 if __name__ == '__main__':

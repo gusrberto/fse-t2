@@ -31,12 +31,12 @@ class Pedals:
         brake = self.read_brake()
 
         if accelerator and not brake:
-            reference_speed = min(current_speed + 2, max_speed)
+            reference_speed = min(current_speed + 10, max_speed)
         elif brake and not accelerator:
-            reference_speed = max(current_speed - 2, 0)
+            reference_speed = max(current_speed - 10, 0)
             self.apply_break_intensity(50)
         else:
-            reference_speed = max(current_speed - 0.5, 0)
+            reference_speed = max(current_speed - 1, 0)
 
         return reference_speed
     
