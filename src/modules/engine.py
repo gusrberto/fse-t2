@@ -32,6 +32,7 @@ class Engine():
         self.pwm.ChangeDutyCycle(value)
         
     def moveEngine(self, value):
+        value = max(-100, min(100, value))
         self.setDutyCycle(abs(value))
         if value < 0:
             self.accelerate_reverse()
