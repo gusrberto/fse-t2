@@ -11,14 +11,11 @@ pid = PID()
 pedals = Pedals()
 hall_sensors = HallSensors()
 
-encerrar = threading.Event()
-
 # Tempo de loop
 sampling_period = 0.2
-
 running = True
-
 current_speed = 0
+timer = None
 
 def main():
     try:
@@ -27,13 +24,16 @@ def main():
         while running:
             time.sleep(1)
     except Exception as e:
-        print(e)
+        print(f"Erro: {e}")
         close()
     except KeyboardInterrupt:
         close()
 
 def routine():
-    global current_speed
+    global current_speed, timer
+
+    if not running:
+        return
 
     # Get reference speed from pedals
     reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
@@ -58,12 +58,17 @@ def routine():
 
     # Re-agendar a execução do controle após o tempo de amostragem
     if running:
-        threading.Timer(sampling_period, routine).start()
+        timer = threading.Timer(sampling_period, routine)
+        timer.start()
 
 def close():
-    global running
+    global running, timer
     running = False
-    encerrar.set()
+
+    if timer:
+        timer.cancel()
+
+    # Desligar componentes
     engine.moveEngine(0)
     hall_sensors.stop()
     pedals.stop()
