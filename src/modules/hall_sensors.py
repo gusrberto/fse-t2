@@ -24,8 +24,8 @@ class HallSensors:
         self.wheel_diameter = 0.63
         self.wheel_circumference = self.wheel_diameter * 3.1416
 
-        GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=1)
-        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=1)
+        GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=200)
+        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=200)
 
     def calc_engine_pulse(self, channel):
         self.engine_pulse_count += 1
