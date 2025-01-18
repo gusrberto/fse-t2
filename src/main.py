@@ -33,6 +33,8 @@ def main():
         close()
 
 def routine():
+    global current_speed
+
     # Get reference speed from pedals
     reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
 
