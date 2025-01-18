@@ -54,7 +54,7 @@ def routine():
 
     # Calculate the control signal using PID
     #control_signal = pid.controller(measured_speed)
-    control_signal = 50
+    control_signal = 20
     # Apply the control signal to the engine
     engine.moveEngine(control_signal)
 
