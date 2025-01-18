@@ -65,6 +65,7 @@ def close():
     encerrar.set()
     engine.moveEngine(0)
     hall_sensors.stop()
+    pedals.stop()
     time.sleep(1)
     print('Sistema encerrado')
 
