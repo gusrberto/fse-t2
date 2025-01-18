@@ -24,8 +24,8 @@ class HallSensors:
         self.wheel_diameter = 0.63
         self.wheel_circumference = self.wheel_diameter * 3.1416
 
-        GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=50)
-        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=50)
+        GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=1)
+        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=1)
 
     def calc_engine_pulse(self, channel):
         self.engine_pulse_count += 1
@@ -34,6 +34,7 @@ class HallSensors:
         self.wheel_pulse_count += 1
         a_state = GPIO.input(self.Sensor_hall_roda_A)
         b_state = GPIO.input(self.Sensor_hall_roda_B)
+        print(f"A state: {a_state}, B state: {b_state}")
         if a_state == GPIO.HIGH and b_state == GPIO.LOW:
             self.wheel_direction = 1
         elif a_state == GPIO.LOW and b_state == GPIO.HIGH:
@@ -59,8 +60,7 @@ class HallSensors:
             wheel_speed = 0.0
 
         # Adiciona depuração para verificar os valores ANTES de resetar
-        print(f"Wheel Pulse Count: {self.wheel_pulse_count}, Elapsed Time: {elapsed_time:.2f}, Calculated Speed: {wheel_speed:.2f} km/h")
-
+        print(f"Pulse Count: {self.wheel_pulse_count}, Elapsed Time: {elapsed_time:.2f}, Speed: {wheel_speed:.2f} km/h")
         # Reseta o contador de pulsos para a próxima leitura
         self.wheel_pulse_count = 0
         self.last_wheel_time = current_time
