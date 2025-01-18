@@ -30,6 +30,8 @@ class Pedals:
         accelerator = self.read_accelerator()
         brake = self.read_brake()
 
+        print(f"Acelerador: {accelerator} || Freio: {brake}")
+
         if accelerator and not brake:
             reference_speed = min(current_speed + 10, max_speed)
         elif brake and not accelerator:
