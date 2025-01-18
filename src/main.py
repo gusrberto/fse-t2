@@ -14,7 +14,7 @@ hall_sensors = HallSensors()
 encerrar = threading.Event()
 
 # Tempo de loop
-sampling_period = 0.2
+sampling_period = 0.5
 
 running = True
 
@@ -52,7 +52,7 @@ def routine():
 
     # Log the current state for debugging
     print(f"Reference Speed: {reference_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, Control Signal: {control_signal:.2f}")
-
+    print(f"Current Speed: {current_speed:.2f} km/h")
     current_speed = measured_speed
 
     # Re-agendar a execução do controle após o tempo de amostragem
