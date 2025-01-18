@@ -4,6 +4,9 @@ from src.modules.hall_sensors import HallSensors
 from src.modules.pedals import Pedals
 import time
 import threading
+import RPi.GPIO as GPIO 
+
+GPIO.setmode(GPIO.BCM)
 
 # Inicializando modulos
 engine = Engine()
