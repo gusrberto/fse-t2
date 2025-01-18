@@ -24,7 +24,8 @@ def main():
 
         while running:
             time.sleep(1)
-    except Exception:
+    except Exception as e:
+        print(e)
         close()
     except KeyboardInterrupt:
         close()
