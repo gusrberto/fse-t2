@@ -50,7 +50,7 @@ def routine():
     #pid.refresh_reference(reference_speed)
 
     # Read the current wheel speed from the sensors
-    #measured_speed = hall_sensors.get_wheel_speed()
+    measured_speed = hall_sensors.get_wheel_speed()
 
     # Calculate the control signal using PID
     #control_signal = pid.controller(measured_speed)
@@ -59,7 +59,7 @@ def routine():
     engine.moveEngine(control_signal)
 
     # Log the current state for debugging
-    #print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
+    print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
     print(f"Control Signal: {control_signal}")
 
     #current_speed = measured_speed
