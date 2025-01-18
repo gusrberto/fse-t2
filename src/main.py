@@ -51,10 +51,10 @@ def routine():
     engine.moveEngine(control_signal)
 
     # Log the current state for debugging
-    print(f"Reference Speed: {reference_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, Control Signal: {control_signal:.2f}")
-    print(f"Current Speed: {current_speed:.2f} km/h")
+    print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
 
-    current_speed = measured_speed
+    #current_speed = measured_speed
+    current_speed += (measured_speed - current_speed) * 0.1
 
     # Re-agendar a execução do controle após o tempo de amostragem
     if running:

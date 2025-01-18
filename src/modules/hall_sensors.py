@@ -24,8 +24,8 @@ class HallSensors:
         self.wheel_diameter = 0.63
         self.wheel_circumference = self.wheel_diameter * 3.1416
 
-        GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=200)
-        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=200)
+        GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=50)
+        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=50)
 
     def calc_engine_pulse(self, channel):
         self.engine_pulse_count += 1
@@ -34,7 +34,10 @@ class HallSensors:
         self.wheel_pulse_count += 1
         a_state = GPIO.input(self.Sensor_hall_roda_A)
         b_state = GPIO.input(self.Sensor_hall_roda_B)
-        self.wheel_direction = 1 if a_state == GPIO.HIGH and b_state == GPIO.LOW else -1
+        if a_state == GPIO.HIGH and b_state == GPIO.LOW:
+            self.wheel_direction = 1
+        elif a_state == GPIO.LOW and b_state == GPIO.HIGH:
+            self.wheel_direction = -1
 
     def get_engine_rpm(self):
         current_time = time.time()
@@ -47,15 +50,23 @@ class HallSensors:
 
     def get_wheel_speed(self):
         current_time = time.time()
-        elapsed_time = current_time - self.last_wheel_time
+        time_elapsed = current_time - self.last_wheel_time
+
+        if time_elapsed > 0:  # Evitar divisão por zero
+            # Velocidade linear = (Pulsos * Circunferência da Roda) / (Tempo decorrido)
+            speed = (self.wheel_pulse_count * self.wheel_circumference) / time_elapsed
+            speed *= self.wheel_direction  # Considerar direção do movimento
+        else:
+            speed = 0.0
+
+        # Reset para a próxima medição
+        self.wheel_pulse_count = 0
         self.last_wheel_time = current_time
 
-        speed_mps = (self.wheel_pulse_count * self.wheel_circumference) / elapsed_time
-        self.wheel_pulse_count = 0
+        print(f"Wheel Pulse Count: {self.wheel_pulse_count}, Direction: {self.wheel_direction}")
 
-        speed_kmh = (speed_mps * 3.6) * self.wheel_direction
-        return speed_kmh
-    
+        return speed * 3.6  # Converter m/s para km/h
+
     def stop(self):
         GPIO.remove_event_detect(self.Sensor_hall_motor)
         GPIO.remove_event_detect(self.Sensor_hall_roda_A)
