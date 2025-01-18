@@ -18,6 +18,8 @@ sampling_period = 0.2
 
 running = True
 
+current_speed = 0
+
 def main():
     try:
         routine()
@@ -32,7 +34,7 @@ def main():
 
 def routine():
     # Get reference speed from pedals
-    reference_speed = pedals.calculate_reference_speed()
+    reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
 
     # Update the PID controller with the new reference speed
     pid.refresh_reference(reference_speed)
@@ -48,6 +50,8 @@ def routine():
 
     # Log the current state for debugging
     print(f"Reference Speed: {reference_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, Control Signal: {control_signal:.2f}")
+
+    current_speed = measured_speed
 
     # Re-agendar a execução do controle após o tempo de amostragem
     if running:
