@@ -50,22 +50,22 @@ class HallSensors:
 
     def get_wheel_speed(self):
         current_time = time.time()
-        time_elapsed = current_time - self.last_wheel_time
+        elapsed_time = current_time - self.last_wheel_time
 
-        if time_elapsed > 0:  # Evitar divisão por zero
-            # Velocidade linear = (Pulsos * Circunferência da Roda) / (Tempo decorrido)
-            speed = (self.wheel_pulse_count * self.wheel_circumference) / time_elapsed
-            speed *= self.wheel_direction  # Considerar direção do movimento
+        if elapsed_time > 0:
+            # Calcula a velocidade com base nos pulsos e no tempo decorrido
+            wheel_speed = (self.wheel_pulse_count * self.wheel_circumference / elapsed_time) * 3.6 * self.wheel_direction
         else:
-            speed = 0.0
+            wheel_speed = 0.0
 
-        # Reset para a próxima medição
+        # Adiciona depuração para verificar os valores ANTES de resetar
+        print(f"Wheel Pulse Count: {self.wheel_pulse_count}, Elapsed Time: {elapsed_time:.2f}, Calculated Speed: {wheel_speed:.2f} km/h")
+
+        # Reseta o contador de pulsos para a próxima leitura
         self.wheel_pulse_count = 0
         self.last_wheel_time = current_time
 
-        print(f"Wheel Pulse Count: {self.wheel_pulse_count}, Direction: {self.wheel_direction}")
-
-        return speed * 3.6  # Converter m/s para km/h
+        return wheel_speed
 
     def stop(self):
         GPIO.remove_event_detect(self.Sensor_hall_motor)
