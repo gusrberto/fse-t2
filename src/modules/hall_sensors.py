@@ -31,7 +31,7 @@ class HallSensors:
         GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=1)
         GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.readEncoder, bouncetime=1)
 
-    def readEncoder(self):
+    def readEncoder(self, channel):
         b_state = GPIO.input(self.Sensor_hall_roda_B)
         increment = 0
         if b_state > 0:
