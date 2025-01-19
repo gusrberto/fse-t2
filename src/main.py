@@ -65,8 +65,8 @@ def routine():
         print(f"Control Signal: {control_signal}")
         print(f"Pedal AC: {pedals.read_accelerator()}, Pedal FR: {pedals.read_brake()}")
 
-        current_speed += measured_speed
-        #current_speed += (measured_speed - current_speed) * 0.1
+        #current_speed += measured_speed
+        current_speed += (measured_speed - current_speed) * 0.1
 
         time.sleep(sampling_period)
 
