@@ -125,7 +125,7 @@ def calibrate_system():
         print("Testando sensores de roda...")
         engine.moveEngine(30)
         time.sleep(3)
-        wheel_speed = hall_sensors.get_wheel_speed()
+        wheel_speed = hall_sensors.compute_velocity()
         engine.moveEngine(0)
         if wheel_speed != 0:
             print(f"Sensores de roda funcionando: Velocidade = {wheel_speed:.2f} km/h")
