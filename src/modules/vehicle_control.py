@@ -95,7 +95,7 @@ class VehicleControl:
         brake_pwm_value = 50
 
         if pedal_fr:
-            self.control_lights(freio=True, farol_baixo=True)
+            self.control_lights(freio=True, farol_baixo=True, farol_alto=True, seta_dir=True, seta_esq=True)
         else:
             self.control_lights(freio=False, farol_baixo=False)
 
