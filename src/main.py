@@ -63,6 +63,7 @@ def routine():
         # Log the current state for debugging
         print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
         print(f"Control Signal: {control_signal}")
+        print(f"Pedal AC: {pedals.read_accelerator()}, Pedal FR: {pedals.read_brake()}")
 
         #current_speed = measured_speed
         #current_speed += (measured_speed - current_speed) * 0.1
