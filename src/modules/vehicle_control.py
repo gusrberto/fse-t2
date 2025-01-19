@@ -21,7 +21,7 @@ class VehicleControl:
 
         GPIO.setup(self.Pedal_AC, GPIO.IN)
         GPIO.setup(self.Pedal_FR, GPIO.IN)
-        print("Entradas setadas")
+
         GPIO.setup([self.Motor_DIR1, self.Motor_DIR2, self.Motor_POT, self.Freio_INT], GPIO.OUT)
 
         self.engine_pwm = GPIO.PWM(self.Motor_POT, 1000)  # Frequência de 1kHz
@@ -40,13 +40,12 @@ class VehicleControl:
             self.current_target_speed = max(self.current_target_speed - self.brake_step, 0)
 
         return self.current_target_speed
-
-    def read_inputs(self):
-        # Leitura dos pedais
-        pedal_ac = GPIO.input(self.Pedal_AC)
-        pedal_fr = GPIO.input(self.Pedal_FR)
-        print(f"Acelerador: {pedal_ac} | Freio: {pedal_fr}")
-        return pedal_ac, pedal_fr
+    
+    def read_accelerator_pedal(self):
+        return GPIO.input(self.Pedal_AC)
+    
+    def read_brake_pedal(self):
+        return GPIO.input(self.Pedal_FR)
 
     def set_engine_mode(self, dir1, dir2, engine_pwm_value, brake_pwm_value):
         # Configuração das saídas
@@ -56,7 +55,8 @@ class VehicleControl:
         self.brake_pwm.ChangeDutyCycle(brake_pwm_value)
 
     def engine_controller(self, pid_control_signal=50):
-        pedal_ac, pedal_fr = self.read_inputs()
+        pedal_ac = self.read_accelerator_pedal()
+        pedal_fr = self.read_brake_pedal()
 
         brake_pwm_value = 50
 

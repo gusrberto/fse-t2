@@ -46,7 +46,8 @@ def routine():
     global current_speed
 
     while running:
-        pedal_ac, pedal_fr = vehicle_control.read_inputs()
+        pedal_ac = vehicle_control.read_accelerator_pedal()
+        pedal_fr = vehicle_control.read_brake_pedal()
 
         target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
 
