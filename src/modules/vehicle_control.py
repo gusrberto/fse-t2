@@ -21,7 +21,7 @@ class VehicleControl:
 
         GPIO.setup(self.Pedal_AC, GPIO.IN)
         GPIO.setup(self.Pedal_FR, GPIO.IN)
-
+        print("Entradas setadas")
         GPIO.setup([self.Motor_DIR1, self.Motor_DIR2, self.Motor_POT, self.Freio_INT], GPIO.OUT)
 
         self.engine_pwm = GPIO.PWM(self.Motor_POT, 1000)  # Frequência de 1kHz
