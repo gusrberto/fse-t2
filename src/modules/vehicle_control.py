@@ -84,6 +84,8 @@ class VehicleControl:
             seta_dir=seta_dir_estado                
         )
 
+        print(f"FB: {farol_baixo_estado}, FA: {farol_alto_estado}, SE: {seta_esq_estado}, SD: {seta_dir_estado}")
+
     def engine_controller(self, pid_control_signal=50):
         pid_control_signal = max(0, min(100, pid_control_signal))
 
