@@ -45,12 +45,14 @@ class HallSensors:
         pos = self.pos_i
 
         current_time = time.time()
-        elapsed_time = current_time - self.previous_time
+        elapsed_time = (current_time - self.previous_time) / 1.0e6
         velocity1 = (pos - self.pos_prev) / elapsed_time
         self.pos_prev = pos
         self.previous_time = current_time
 
         print(f"Velocidade 1: {velocity1}")
+
+        return velocity1
 
 
     def calc_engine_pulse(self, channel):
