@@ -64,6 +64,7 @@ def routine():
         print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
         print(f"Control Signal: {control_signal}")
         print(f"Pedal AC: {pedals.read_accelerator()}, Pedal FR: {pedals.read_brake()}")
+        print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
 
         current_speed += measured_speed * 0.08
         #current_speed += (measured_speed - current_speed) * 0.4
