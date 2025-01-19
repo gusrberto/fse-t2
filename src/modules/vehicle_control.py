@@ -41,6 +41,7 @@ class VehicleControl:
         # Leitura dos pedais
         pedal_ac = GPIO.input(self.Pedal_AC)
         pedal_fr = GPIO.input(self.Pedal_FR)
+        print(f"Acelerador: {pedal_ac} | Freio: {pedal_fr}")
         return pedal_ac, pedal_fr
 
     def set_engine_mode(self, dir1, dir2, engine_pwm_value, brake_pwm_value):
