@@ -45,7 +45,7 @@ class HallSensors:
         pos = self.pos_i
 
         current_time = time.time()
-        elapsed_time = (current_time - self.previous_time) / 1.0e6
+        elapsed_time = (current_time - self.previous_time)
         velocity1 = (pos - self.pos_prev) / elapsed_time
         self.pos_prev = pos
         self.previous_time = current_time
