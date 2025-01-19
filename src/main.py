@@ -58,7 +58,7 @@ def routine():
         #control_signal = pid.controller(measured_speed)
         control_signal = 100
         # Apply the control signal to the engine
-        engine.moveEngine(control_signal)
+        engine.moveEngine(0)
 
         # Log the current state for debugging
         print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
