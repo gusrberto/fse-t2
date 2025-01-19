@@ -17,8 +17,12 @@ class VehicleControl:
         self.Pedal_FR = 22
 
         GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+
+        GPIO.setup(self.Pedal_AC, GPIO.IN)
+        GPIO.setup(self.Pedal_FR, GPIO.IN)
+
         GPIO.setup([self.Motor_DIR1, self.Motor_DIR2, self.Motor_POT, self.Freio_INT], GPIO.OUT)
-        GPIO.setup([self.Pedal_AC, self.Pedal_FR], GPIO.IN)
 
         self.engine_pwm = GPIO.PWM(self.Motor_POT, 1000)  # Frequência de 1kHz
         self.brake_pwm = GPIO.PWM(self.Freio_INT, 1000)  # Frequência de 1kHz
