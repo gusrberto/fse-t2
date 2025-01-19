@@ -16,8 +16,10 @@ sampling_period = 0.2
 running = True
 current_speed = 0
 timer = None
+routine_thread = None
 
 def main():
+    global routine_thread
     try:
         # Executa a calibração e verifica se foi bem-sucedida
         if not calibrate_system():
@@ -26,7 +28,8 @@ def main():
             return
 
         # Inicia a rotina principal
-        routine()
+        routine_thread = threading.Thread(target=routine)
+        routine_thread.start()
 
         while running:
             time.sleep(1)
@@ -38,6 +41,35 @@ def main():
 
 
 def routine():
+    global current_speed
+
+    while running:
+
+        # Get reference speed from pedals
+        #reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
+
+        # Update the PID controller with the new reference speed
+        #pid.refresh_reference(reference_speed)
+
+        # Read the current wheel speed from the sensors
+        measured_speed = hall_sensors.get_wheel_speed()
+
+        # Calculate the control signal using PID
+        #control_signal = pid.controller(measured_speed)
+        control_signal = 100
+        # Apply the control signal to the engine
+        engine.moveEngine(control_signal)
+
+        # Log the current state for debugging
+        print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
+        print(f"Control Signal: {control_signal}")
+
+        #current_speed = measured_speed
+        #current_speed += (measured_speed - current_speed) * 0.1
+
+        time.sleep(sampling_period)
+
+""" def routine_com_timer():
     global current_speed, timer
 
     if not running:
@@ -54,7 +86,7 @@ def routine():
 
     # Calculate the control signal using PID
     #control_signal = pid.controller(measured_speed)
-    control_signal = 80
+    control_signal = 100
     # Apply the control signal to the engine
     engine.moveEngine(control_signal)
 
@@ -68,7 +100,7 @@ def routine():
     # Re-agendar a execução do controle após o tempo de amostragem
     if running:
         timer = threading.Timer(sampling_period, routine)
-        timer.start()
+        timer.start() """
 
 def calibrate_system():
     print("Iniciando calibração do sistema...")
@@ -116,6 +148,20 @@ def calibrate_system():
 
 
 def close():
+    global running, routine_thread
+    running = False
+
+    if routine_thread is not None:
+        routine_thread.join()
+
+    # Desligar componentes
+    engine.moveEngine(0)
+    hall_sensors.stop()
+    pedals.stop()
+    time.sleep(1)
+    print('Sistema encerrado')
+
+""" def close_com_timer():
     global running, timer
     running = False
 
@@ -127,7 +173,7 @@ def close():
     hall_sensors.stop()
     pedals.stop()
     time.sleep(1)
-    print('Sistema encerrado')
+    print('Sistema encerrado') """
 
 if __name__ == '__main__':
     main()
