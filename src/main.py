@@ -46,17 +46,17 @@ def routine():
     while running:
 
         # Get reference speed from pedals
-        reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
+        #reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
 
         # Update the PID controller with the new reference speed
-        pid.refresh_reference(reference_speed)
+        #pid.refresh_reference(reference_speed)
 
         # Read the current wheel speed from the sensors
-        measured_speed = hall_sensors.get_wheel_speed()
+        measured_speed = hall_sensors.compute_velocity()
 
         # Calculate the control signal using PID
-        control_signal = pid.controller(measured_speed)
-        #control_signal = 100
+        #control_signal = pid.controller(measured_speed)
+        control_signal = 50
         # Apply the control signal to the engine
         engine.moveEngine(control_signal)
 
@@ -64,7 +64,7 @@ def routine():
         print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
         print(f"Control Signal: {control_signal}")
         print(f"Pedal AC: {pedals.read_accelerator()}, Pedal FR: {pedals.read_brake()}")
-        print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
+        #print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
 
         current_speed += measured_speed * 0.08
         #current_speed += (measured_speed - current_speed) * 0.4

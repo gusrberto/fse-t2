@@ -21,11 +21,37 @@ class HallSensors:
         self.wheel_direction = 1 # Carro indo pra frente
         self.wheel_pulse_count = 0
 
+        self.pos_i = 0
+        self.previous_time = 0
+        self.pos_prev = 0
+
         self.wheel_diameter = 0.63
         self.wheel_circumference = self.wheel_diameter * 3.1416
 
         GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.calc_engine_pulse, bouncetime=1)
-        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.calc_wheel_pulse, bouncetime=1)
+        GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.readEncoder, bouncetime=1)
+
+    def readEncoder(self):
+        b_state = GPIO.input(self.Sensor_hall_roda_B)
+        increment = 0
+        if b_state > 0:
+            increment = 1
+        else:
+            increment = -1
+        self.pos_i = self.pos_i + increment
+
+    def compute_velocity(self):
+        pos = 0
+        pos = self.pos_i
+
+        current_time = time.time()
+        elapsed_time = current_time - self.previous_time
+        velocity1 = (pos - self.pos_prev) / elapsed_time
+        self.pos_prev = pos
+        self.previous_time = current_time
+
+        print(f"Velocidade 1: {velocity1}")
+
 
     def calc_engine_pulse(self, channel):
         self.engine_pulse_count += 1
