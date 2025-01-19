@@ -16,6 +16,14 @@ class VehicleControl:
         self.Pedal_AC = 27
         self.Pedal_FR = 22
 
+        # Configuração das luzes/faróis
+        self.Farol_Baixo = 19
+        self.Farol_Alto = 26
+        self.Luz_Freio = 25
+        self.Luz_Seta_Esq = 8
+        self.Luz_Seta_Dir = 7
+        self.Luz_Temp_Motor = 12
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
@@ -23,6 +31,7 @@ class VehicleControl:
         GPIO.setup(self.Pedal_FR, GPIO.IN)
 
         GPIO.setup([self.Motor_DIR1, self.Motor_DIR2, self.Motor_POT, self.Freio_INT], GPIO.OUT)
+        GPIO.setup([self.Farol_Baixo, self.Farol_Alto, self.Luz_Freio, self.Luz_Seta_Dir, self.Luz_Seta_Esq, self.Luz_Temp_Motor], GPIO.OUT)
 
         self.engine_pwm = GPIO.PWM(self.Motor_POT, 1000)  # Frequência de 1kHz
         self.brake_pwm = GPIO.PWM(self.Freio_INT, 1000)  # Frequência de 1kHz
@@ -54,6 +63,14 @@ class VehicleControl:
         self.engine_pwm.ChangeDutyCycle(engine_pwm_value)
         self.brake_pwm.ChangeDutyCycle(brake_pwm_value)
 
+    def control_lights(self, farol_baixo=False, farol_alto=False, freio=False, seta_esq=False, seta_dir=False, motor_temp_alert=False):
+        GPIO.output(self.Farol_Baixo, GPIO.HIGH if farol_baixo else GPIO.LOW)
+        GPIO.output(self.Farol_Alto, GPIO.HIGH if farol_alto else GPIO.LOW)
+        GPIO.output(self.Luz_Freio, GPIO.HIGH if freio else GPIO.LOW)
+        GPIO.output(self.Luz_Seta_Esq, GPIO.HIGH if seta_esq else GPIO.LOW)
+        GPIO.output(self.Luz_Seta_Dir, GPIO.HIGH if seta_dir else GPIO.LOW)
+        GPIO.output(self.Luz_Temp_Motor, GPIO.HIGH if motor_temp_alert else GPIO.LOW)
+
     def engine_controller(self, pid_control_signal=50):
         pid_control_signal = max(0, min(100, pid_control_signal))
 
@@ -61,6 +78,11 @@ class VehicleControl:
         pedal_fr = self.read_brake_pedal()
 
         brake_pwm_value = 50
+
+        if pedal_fr:
+            self.control_lights(freio=True)
+        else:
+            self.control_lights(freio=False)
 
         if pedal_ac and not pedal_fr:
             # Andar pra frente

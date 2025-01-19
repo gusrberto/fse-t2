@@ -1,7 +1,5 @@
-from src.modules.engine import Engine
 from src.modules.pid import PID
 from src.modules.hall_sensors import HallSensors
-from src.modules.pedals import Pedals
 from src.modules.vehicle_control import VehicleControl
 import RPi.GPIO as GPIO
 import time
