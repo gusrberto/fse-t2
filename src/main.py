@@ -55,7 +55,7 @@ def routine():
         #control_signal = pid.controller(measured_speed)
         control_signal = 100
         # Apply the control signal to the engine
-        engine.moveEngine(75)
+        engine.moveEngine(10)
 
         # Read the current wheel speed from the sensors
         measured_speed = hall_sensors.get_wheel_speed()
