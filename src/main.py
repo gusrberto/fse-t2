@@ -55,7 +55,7 @@ def routine():
         #control_signal = pid.controller(measured_speed)
         control_signal = 100
         # Apply the control signal to the engine
-        engine.moveEngine(10)
+        engine.moveEngine(100)
 
         # Read the current wheel speed from the sensors
         measured_speed = hall_sensors.get_wheel_speed()
@@ -65,7 +65,7 @@ def routine():
         print(f"Control Signal: {control_signal}")
         print(f"Pedal AC: {pedals.read_accelerator()}, Pedal FR: {pedals.read_brake()}")
 
-        current_speed += measured_speed * 0.3
+        current_speed += measured_speed * 0.08
         #current_speed += (measured_speed - current_speed) * 0.4
 
         time.sleep(sampling_period)
