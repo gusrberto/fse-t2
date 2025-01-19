@@ -71,6 +71,19 @@ class VehicleControl:
         GPIO.output(self.Luz_Seta_Dir, GPIO.HIGH if seta_dir else GPIO.LOW)
         GPIO.output(self.Luz_Temp_Motor, GPIO.HIGH if motor_temp_alert else GPIO.LOW)
 
+    def update_lights_state(self):
+        farol_baixo_estado = GPIO.input(self.Farol_Baixo)
+        farol_alto_estado = GPIO.input(self.Farol_Alto)
+        seta_esq_estado = GPIO.input(self.Luz_Seta_Esq)
+        seta_dir_estado = GPIO.input(self.Luz_Seta_Dir)
+
+        self.control_lights(
+            farol_baixo=farol_baixo_estado,
+            farol_alto=farol_alto_estado,
+            seta_esq=seta_esq_estado,
+            seta_dir=seta_dir_estado                
+        )
+
     def engine_controller(self, pid_control_signal=50):
         pid_control_signal = max(0, min(100, pid_control_signal))
 

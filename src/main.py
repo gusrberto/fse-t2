@@ -43,6 +43,8 @@ def routine():
     global current_speed
 
     while running:
+        vehicle_control.update_lights_state()
+
         pedal_ac = vehicle_control.read_accelerator_pedal()
         pedal_fr = vehicle_control.read_brake_pedal()
 
