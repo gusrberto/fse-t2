@@ -133,7 +133,7 @@ def calibrate_system():
 
         # Verificação dos pedais
         print("Testando pedais...")
-        if not (pedals.read_accelerator() or pedals.read_brake()):
+        if not pedals.check_pedals():
             print("Erro: Nenhum sinal dos pedais!")
             success = False
         else:

@@ -42,6 +42,23 @@ class Pedals:
 
         return reference_speed
     
+    def check_pedals(self):
+        try:
+            # Verifica se os pinos foram configurados corretamente
+            GPIO.setup(self.Pedal_AC, GPIO.IN)
+            GPIO.setup(self.Pedal_FR, GPIO.IN)
+
+            # Faz leituras para garantir que estão acessíveis
+            accelerator_state = self.read_accelerator()
+            brake_state = self.read_brake()
+
+            print(f"Estado inicial do acelerador: {accelerator_state}, Estado inicial do freio: {brake_state}")
+
+            return True
+        except Exception as e:
+            print(f"Erro ao verificar pedais: {e}")
+            return False
+
     def stop(self):
         self.brake_pwm.stop()
         GPIO.cleanup()
