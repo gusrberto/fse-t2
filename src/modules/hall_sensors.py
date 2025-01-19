@@ -47,13 +47,17 @@ class HallSensors:
 
         current_time = time.time()
         elapsed_time = (current_time - self.previous_time)
-        velocity1 = (pos - self.pos_prev) / elapsed_time
+        velocity_ps = (pos - self.pos_prev) / elapsed_time
         self.pos_prev = pos
         self.previous_time = current_time
 
-        print(f"Velocidade 1: {velocity1}")
+        print(f"Velocidade 1: {velocity_ps}") # Em pulsos/s
 
-        return velocity1
+        wheel_circumference = 0.63 * 3.1416
+
+        velocity_kmh = velocity_ps * wheel_circumference * 3.6
+
+        return velocity_kmh
 
 
     def calc_engine_pulse(self, channel):
