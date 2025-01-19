@@ -22,7 +22,7 @@ class HallSensors:
         self.wheel_pulse_count = 0
 
         self.pos_i = 0
-        self.previous_time = 0
+        self.previous_time = time.time()
         self.pos_prev = 0
 
         self.wheel_diameter = 0.63
@@ -32,13 +32,14 @@ class HallSensors:
         GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.readEncoder, bouncetime=1)
 
     def readEncoder(self, channel):
+        a_state = GPIO.input(self.Sensor_hall_roda_A)
         b_state = GPIO.input(self.Sensor_hall_roda_B)
         increment = 0
-        if b_state > 0:
+        if a_state == GPIO.HIGH and b_state == GPIO.LOW:
             increment = 1
-        else:
+        elif a_state == GPIO.LOW and b_state == GPIO.HIGH:
             increment = -1
-        self.pos_i = self.pos_i + increment
+        self.pos_i += increment
 
     def compute_velocity(self):
         pos = 0
