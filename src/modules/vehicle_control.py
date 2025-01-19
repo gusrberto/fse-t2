@@ -55,6 +55,8 @@ class VehicleControl:
         self.brake_pwm.ChangeDutyCycle(brake_pwm_value)
 
     def engine_controller(self, pid_control_signal=50):
+        pid_control_signal = max(0, min(100, pid_control_signal))
+
         pedal_ac = self.read_accelerator_pedal()
         pedal_fr = self.read_brake_pedal()
 

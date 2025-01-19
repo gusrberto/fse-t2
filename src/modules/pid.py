@@ -9,7 +9,7 @@ class PID:
         self.total_error = 0.0
         self.previous_error = 0.0
         self.control_signal_max = 100.0
-        self.control_signal_min = -100.0
+        self.control_signal_min = 0.0
 
     def refresh_reference(self, new_reference):
         self.reference = new_reference
