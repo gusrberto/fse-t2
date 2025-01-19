@@ -2,14 +2,16 @@ from src.modules.engine import Engine
 from src.modules.pid import PID
 from src.modules.hall_sensors import HallSensors
 from src.modules.pedals import Pedals
+from src.modules.vehicle_control import VehicleControl
 import time
 import threading
 
 # Inicializando modulos
 engine = Engine()
-pid = PID()
+engine_pid = PID()
 pedals = Pedals()
 hall_sensors = HallSensors()
+vehicle_control = VehicleControl(max_speed=200)
 
 # Tempo de loop
 sampling_period = 0.2
@@ -21,11 +23,11 @@ routine_thread = None
 def main():
     global routine_thread
     try:
-        # Executa a calibração e verifica se foi bem-sucedida
+        """ # Executa a calibração e verifica se foi bem-sucedida
         if not calibrate_system():
             print("Calibração falhou. Encerrando o sistema...")
             close()
-            return
+            return """
 
         # Inicia a rotina principal
         routine_thread = threading.Thread(target=routine)
@@ -44,30 +46,23 @@ def routine():
     global current_speed
 
     while running:
+        pedal_ac, pedal_fr = vehicle_control.read_inputs()
 
-        # Get reference speed from pedals
-        #reference_speed = pedals.calculate_reference_speed(current_speed=current_speed)
+        target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
 
-        # Update the PID controller with the new reference speed
-        #pid.refresh_reference(reference_speed)
+        engine_pid.refresh_reference(target_speed)
 
-        # Read the current wheel speed from the sensors
-        measured_speed = hall_sensors.compute_velocity()
+        measured_speed = hall_sensors.compute_wheel_velocity()
 
-        # Calculate the control signal using PID
-        #control_signal = pid.controller(measured_speed)
-        control_signal = 50
-        # Apply the control signal to the engine
-        engine.moveEngine(control_signal)
+        pid_control_signal = engine_pid.controller(measured_speed)
 
-        # Log the current state for debugging
-        print(f"Measured Speed: {measured_speed:.2f} km/h, Current Speed: {current_speed:.2f} km/h")
-        print(f"Control Signal: {control_signal}")
-        print(f"Pedal AC: {pedals.read_accelerator()}, Pedal FR: {pedals.read_brake()}")
-        #print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
+        vehicle_control.engine_controller(pid_control_signal)
 
-        current_speed += measured_speed * 0.08
-        #current_speed += (measured_speed - current_speed) * 0.4
+        current_speed = measured_speed
+
+        # 8. Log para depuração
+        print(f"Target Speed: {target_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, PID Control Signal: {pid_control_signal:.2f}")
+        print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
 
         time.sleep(sampling_period)
 
@@ -160,6 +155,7 @@ def close():
     engine.moveEngine(0)
     hall_sensors.stop()
     pedals.stop()
+    vehicle_control.cleanup()
     time.sleep(1)
     print('Sistema encerrado')
 
