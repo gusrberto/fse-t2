@@ -101,14 +101,24 @@ def calibrate_system(vehicle_control, hall_sensors):
 
         # Verificação dos pedais
         print("Testando pedais...")
+        GPIO.output(vehicle_control.Pedal_AC, GPIO.HIGH)  # Simula pressionar o acelerador
         pedal_ac = vehicle_control.read_accelerator_pedal()
-        pedal_fr = vehicle_control.read_brake_pedal()
-
-        if pedal_ac == 0 and pedal_fr == 0:
-            print("Erro: Nenhum sinal dos pedais!")
-            success = False
+        if pedal_ac == 1:
+            print("Acelerador funcionando corretamente.")
         else:
-            print("Pedais funcionando corretamente.")
+            print("Erro: O pedal do acelerador não respondeu!")
+            success = False
+
+        GPIO.output(vehicle_control.Pedal_FR, GPIO.HIGH)  # Simula pressionar o freio
+        pedal_fr = vehicle_control.read_brake_pedal()
+        if pedal_fr == 1:
+            print("Freio funcionando corretamente.")
+        else:
+            print("Erro: O pedal do freio não respondeu!")
+            success = False
+
+        GPIO.output(vehicle_control.Pedal_AC, GPIO.LOW)
+        GPIO.output(vehicle_control.Pedal_FR, GPIO.LOW)
 
     except Exception as e:
         print(f"Erro durante a calibração: {e}")
