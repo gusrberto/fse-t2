@@ -7,9 +7,9 @@ import time
 import threading
 
 # Inicializando modulos
-engine = Engine()
+#engine = Engine()
 engine_pid = PID()
-pedals = Pedals()
+#pedals = Pedals()
 hall_sensors = HallSensors()
 vehicle_control = VehicleControl(max_speed=200)
 
@@ -99,7 +99,7 @@ def routine():
         timer = threading.Timer(sampling_period, routine)
         timer.start() """
 
-def calibrate_system():
+""" def calibrate_system():
     print("Iniciando calibração do sistema...")
     success = True
 
@@ -141,7 +141,7 @@ def calibrate_system():
         success = False
 
     print("Calibração concluída.")
-    return success
+    return success """
 
 
 def close():
@@ -152,9 +152,9 @@ def close():
         routine_thread.join()
 
     # Desligar componentes
-    engine.moveEngine(0)
+    #engine.moveEngine(0)
     hall_sensors.stop()
-    pedals.stop()
+    #pedals.stop()
     vehicle_control.cleanup()
     time.sleep(1)
     print('Sistema encerrado')
