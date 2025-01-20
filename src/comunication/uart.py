@@ -139,8 +139,9 @@ class Uart:
             message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
             #print(message)
             crc = calculate_crc(message, len(message))
-            print(message)
+            print(f"message antes do incremento {message}")
             message += crc
+            print(f"message depois do incremento {message}")
             
             response = self.send_message(message, "escrever_byte_registrador")
 
