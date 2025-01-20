@@ -62,7 +62,9 @@ class Uart:
     def send_message(self, message, message_type):
         response = None
         with self.uart_lock:
+            print("No send_message antes de escrever")
             self.serial.write(message)
+            print("No send_message depois de escrever")
             time.sleep(0.05)
 
             if (message_type == "ler_temperatura"):
