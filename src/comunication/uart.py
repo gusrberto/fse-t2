@@ -28,6 +28,40 @@ class Uart:
         crc = calculate_crc(buffer[:-crc_size], buffer_size - crc_size).to_bytes(crc_size, 'little')
         return crc_buffer == crc
     
-"""     def read(self, ):
+    def read(self, size):
         try:
-            self.connect() """
+            self.connect()
+            if not self.serial.is_open:
+                print("Erro: UART não está aberta")
+                return b''
+            
+            buffer = self.serial.read(size)
+            if len(buffer) == 0:
+                print("Nenhum dado recebido, possivelmente timeout")
+                return b''
+            
+            size = len(buffer)
+
+            if self.crc_validate(buffer, size):
+                return buffer
+            else:
+                print('Dados incorretos: ', buffer)
+                return b''
+        except Exception as e:
+            print(f'Erro na leitura da UART: {str(e)}')
+            return b''
+        finally:
+            self.disconnect()  
+
+    def write(self, message, size, skip_response=False):
+        try:
+            message_crc = calculate_crc(message, size).to_bytes(2, 'little')
+            final_message = message + message_crc
+            self.connect()
+            self.serial.write(final_message)
+        except Exception as e:
+            print(f"Erro ao escrever na UART: {str(e)}")
+        finally:
+            if skip_response:
+                self.serial.read(size)
+                self.disconnect()

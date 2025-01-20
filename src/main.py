@@ -1,6 +1,10 @@
 from src.modules.pid import PID
 from src.modules.hall_sensors import HallSensors
 from src.modules.vehicle_control import VehicleControl
+
+from src.comunication.uart import Uart
+from src.comunication.modbus import get_code
+
 import RPi.GPIO as GPIO
 import time
 import threading
@@ -9,6 +13,9 @@ import threading
 engine_pid = PID()
 hall_sensors = HallSensors()
 vehicle_control = VehicleControl(max_speed=200)
+uart = Uart()
+
+uart_lock = threading.Lock()
 
 # Tempo de loop
 sampling_period = 0.2
@@ -65,6 +72,7 @@ def routine():
         # 8. Log para depuração
         print(f"Target Speed: {target_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, PID Control Signal: {pid_control_signal:.2f}")
         print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
+        print(f"Current Speed: {current_speed}")
 
         time.sleep(sampling_period)
 
@@ -106,6 +114,22 @@ def calibrate_system(vehicle_control, hall_sensors):
     print("Calibração concluída.")
     return success
 
+def uart_listener(message, value=0, command=None):
+    while running:
+        try:
+            if message == 'le_registrador':
+                with uart_lock:
+                    full_message = get_code(message)
+                    uart.write(full_message, len(full_message))
+                    response = uart.read(15)
+
+                    if isinstance(response, str):
+                        response = response.encode('utf-8')
+
+                    return response
+        except Exception as e:
+            print(f"Erro na função UART Listener: {e}")
+        time.sleep(0.05) # 50ms
 
 def close():
     global running, routine_thread
