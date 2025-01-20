@@ -99,6 +99,7 @@ class Uart:
     def read_registers_byte(self, information):
         with self.uart_lock: 
             print(f"read registers byte")
+            print(f"information: {information}, get_address: {self.get_address(information, 1)}, mat_digits: {mat_digits}")
             message = bytes([0x01, 0x03]) + self.get_address(information, 1) + mat_digits
            
             crc = calculate_crc(message, len(message))
