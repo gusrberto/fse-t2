@@ -35,6 +35,8 @@ class Uart:
         self.seta_dir_thread = None
 
     def connect(self) -> None:
+        print(self.serial)
+        print(self.serial.is_open)
         if self.serial is not None and not self.serial.is_open:
             self.serial.open()
             print("UART conectada com sucesso!")
