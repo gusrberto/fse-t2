@@ -137,8 +137,9 @@ class Uart:
         with self.uart_lock: 
             print(f"write registers byte")
             message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
-            print(message)
+            #print(message)
             crc = calculate_crc(message, len(message))
+            print(message)
             message += crc
             
             response = self.send_message(message, "escrever_byte_registrador")
