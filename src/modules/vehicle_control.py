@@ -1,4 +1,6 @@
 import RPi.GPIO as GPIO
+import time
+import threading
 
 class VehicleControl:
     def __init__(self, max_speed=200):
@@ -24,6 +26,11 @@ class VehicleControl:
         self.Luz_Seta_Dir = 7
         self.Luz_Temp_Motor = 12
 
+        self.seta_esq_active = False
+        self.seta_dir_active = False
+        self.seta_esq_thread = None
+        self.seta_dir_thread = None
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
@@ -37,6 +44,8 @@ class VehicleControl:
         self.brake_pwm = GPIO.PWM(self.Freio_INT, 1000)  # Frequência de 1kHz
         self.engine_pwm.start(0)
         self.brake_pwm.start(0)
+
+    # CONTROLE DO MOTOR E RODAS E PEDAIS
 
     def calculate_target_speed(self, pedal_ac, pedal_fr):
         if pedal_ac and not pedal_fr:
@@ -63,29 +72,6 @@ class VehicleControl:
         self.engine_pwm.ChangeDutyCycle(engine_pwm_value)
         self.brake_pwm.ChangeDutyCycle(brake_pwm_value)
 
-    def control_lights(self, farol_baixo=False, farol_alto=False, freio=False, seta_esq=False, seta_dir=False, motor_temp_alert=False):
-        GPIO.output(self.Farol_Baixo, GPIO.HIGH if farol_baixo else GPIO.LOW)
-        GPIO.output(self.Farol_Alto, GPIO.HIGH if farol_alto else GPIO.LOW)
-        GPIO.output(self.Luz_Freio, GPIO.HIGH if freio else GPIO.LOW)
-        GPIO.output(self.Luz_Seta_Esq, GPIO.HIGH if seta_esq else GPIO.LOW)
-        GPIO.output(self.Luz_Seta_Dir, GPIO.HIGH if seta_dir else GPIO.LOW)
-        GPIO.output(self.Luz_Temp_Motor, GPIO.HIGH if motor_temp_alert else GPIO.LOW)
-
-    def update_lights_state(self):
-        farol_baixo_estado = GPIO.input(self.Farol_Baixo)
-        farol_alto_estado = GPIO.input(self.Farol_Alto)
-        seta_esq_estado = GPIO.input(self.Luz_Seta_Esq)
-        seta_dir_estado = GPIO.input(self.Luz_Seta_Dir)
-
-        self.control_lights(
-            farol_baixo=farol_baixo_estado,
-            farol_alto=farol_alto_estado,
-            seta_esq=seta_esq_estado,
-            seta_dir=seta_dir_estado                
-        )
-
-        print(f"FB: {farol_baixo_estado}, FA: {farol_alto_estado}, SE: {seta_esq_estado}, SD: {seta_dir_estado}")
-
     def engine_controller(self, pid_control_signal=50):
         pid_control_signal = max(0, min(100, pid_control_signal))
 
@@ -111,6 +97,49 @@ class VehicleControl:
         else:
             # Neutro
             self.set_engine_mode(GPIO.LOW, GPIO.LOW, 0, 0)
+
+    # CONTROLE DAS LUZES (FAROL E SETA)
+
+    def control_lights(self, farol_baixo=False, farol_alto=False, freio=False, seta_esq=False, seta_dir=False, motor_temp_alert=False):
+        GPIO.output(self.Farol_Baixo, GPIO.HIGH if farol_baixo else GPIO.LOW)
+        GPIO.output(self.Farol_Alto, GPIO.HIGH if farol_alto else GPIO.LOW)
+        GPIO.output(self.Luz_Freio, GPIO.HIGH if freio else GPIO.LOW)
+        GPIO.output(self.Luz_Seta_Esq, GPIO.HIGH if seta_esq else GPIO.LOW)
+        GPIO.output(self.Luz_Seta_Dir, GPIO.HIGH if seta_dir else GPIO.LOW)
+        GPIO.output(self.Luz_Temp_Motor, GPIO.HIGH if motor_temp_alert else GPIO.LOW)
+
+    def blink_signal(self, pin):
+        while (self.seta_esq_active and pin == self.Luz_Seta_Esq) or (self.seta_dir_active and pin == self.Luz_Seta_Dir):
+            GPIO.output(pin, GPIO.HIGH)
+            time.sleep(0.5)
+            GPIO.output(pin, GPIO.LOW)
+            time.sleep(0.5)
+
+    def left_signal_blink(self):
+        if not self.seta_esq_active:
+            self.seta_esq_active = True
+            self.seta_esq_thread = threading.Thread(target=self.blink_signal, args=(self.Luz_Seta_Esq,))
+            self.seta_esq_thread.start()
+
+    def left_signal_off(self):
+        if self.seta_esq_active:
+            self.seta_esq_active = False
+            self.seta_esq_thread.join()
+            self.seta_esq_thread = None
+            GPIO.output(self.Luz_Seta_Esq, GPIO.LOW)
+
+    def right_signal_blink(self):
+        if not self.seta_dir_active:
+            self.seta_dir_active = True
+            self.seta_dir_thread = threading.Thread(target=self.blink_signal, args=(self.Luz_Seta_Dir,))
+            self.seta_dir_thread.start()
+
+    def right_signal_off(self):
+        if self.seta_dir_active:
+            self.seta_dir_active = False
+            self.seta_dir_thread.join()
+            self.seta_dir_thread = None
+            GPIO.output(self.Luz_Seta_Dir, GPIO.LOW)
 
     def cleanup(self):
         self.engine_pwm.stop()
