@@ -27,6 +27,7 @@ class Uart:
                                     bytesize=serial.EIGHTBITS,
                                     timeout=0.5)
         if self.serial is not None: print("UART Inicializada")
+        self.serial.close()
         
         self.uart_lock = lock
         self.seta_esq_active = False
@@ -35,8 +36,6 @@ class Uart:
         self.seta_dir_thread = None
 
     def connect(self) -> None:
-        print(self.serial)
-        print(self.serial.is_open)
         if self.serial is not None and not self.serial.is_open:
             self.serial.open()
             print("UART conectada com sucesso!")
