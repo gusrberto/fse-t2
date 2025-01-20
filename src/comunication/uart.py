@@ -144,7 +144,7 @@ class Uart:
             print(f"message depois do incremento {message}")
             
             response = self.send_message(message, "escrever_byte_registrador")
-
+            print(f"apos a reposta da uart")
             crc_status = self.crc_validate(response, len(response))
 
             if crc_status:
