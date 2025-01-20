@@ -95,7 +95,8 @@ class Uart:
             else:
                 print("Erro no CRC (Leitura de valor de temperatura do motor)")
 
-        def read_registers_byte(self, information):
+    def read_registers_byte(self, information):
+        with self.uart_lock: 
             message = bytes([0x01, 0x03]) + self.get_address(information, 1) + mat_digits
             crc = calculate_crc(message, len(message))
             message += crc
