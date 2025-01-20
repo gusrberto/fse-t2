@@ -178,8 +178,8 @@ def uart_listener():
                 uart.write_registers_byte("seta", 0)
 
             # Escrevendo velocidade e rpm no painel
-            uart.write_registers_float("velocidade", current_speed)
-            uart.write_registers_float("rotacao_motor", engine_rpm)
+            #uart.write_registers_float("velocidade", current_speed)
+            #uart.write_registers_float("rotacao_motor", engine_rpm)
 
         except Exception as e:
             print(f"Erro na função UART Listener: {e}")
