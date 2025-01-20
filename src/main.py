@@ -13,7 +13,7 @@ engine_pid = PID()
 hall_sensors = HallSensors()
 vehicle_control = VehicleControl(max_speed=200)
 
-uart_lock = threading.Lock()
+uart_lock = threading.RLock()
 uart = Uart(lock=uart_lock)
 
 # Tempo de loop
