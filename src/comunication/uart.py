@@ -81,6 +81,7 @@ class Uart:
             round_temp = round(temp, 2)
 
             message = bytes([0x01, 0x23, 0xAA]) + mat_digits
+            print(message)
             crc = calculate_crc(message, len(message))
             message += crc
 
@@ -98,6 +99,7 @@ class Uart:
     def read_registers_byte(self, information):
         with self.uart_lock: 
             message = bytes([0x01, 0x03]) + self.get_address(information, 1) + mat_digits
+            print(message)
             crc = calculate_crc(message, len(message))
             message += crc
 
@@ -113,6 +115,7 @@ class Uart:
     def read_registers_float(self, information):
         with self.uart_lock: 
             message = bytes([0x01, 0x03]) + self.get_address(information, 4) + mat_digits
+            print(message)
             crc = calculate_crc(message, len(message))
             message += crc
 
@@ -130,6 +133,7 @@ class Uart:
     def write_registers_byte(self, information, data):
         with self.uart_lock: 
             message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
+            print(message)
             crc = calculate_crc(message, len(message))
             message += crc
 
@@ -148,6 +152,7 @@ class Uart:
         with self.uart_lock: 
             float_bytes = struct.pack('<f', data)
             message = bytes([0x01, 0x06]) + self.get_address(information, 4) + float_bytes + mat_digits
+            print(message)
             crc = calculate_crc(message, len(message))
             message += crc
 
