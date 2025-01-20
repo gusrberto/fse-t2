@@ -40,4 +40,4 @@ def calculate_crc(cmd, size):
     crc = 0
     for i in range(0, size):
         crc = crc16(crc, cmd[i])
-    return crc
+    return crc.to_bytes(2, byteorder='little')

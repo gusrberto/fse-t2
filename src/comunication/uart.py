@@ -112,7 +112,7 @@ class Uart:
                 register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
                 return register_value
             else:
-                return print("Erro no CRC (Leitura registradores Float)")
+                return print("Erro no CRC (Leitura registradores byte)")
             
     def read_registers_float(self, information):
         with self.uart_lock:
