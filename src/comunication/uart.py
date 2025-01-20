@@ -54,8 +54,9 @@ class Uart:
     
     def get_address(self, information, bytes_size):
         address = address_table.get(information)
-        sub_code = bytes([address, bytes_size])
-        return sub_code
+        if address is None:
+            raise ValueError(f"Endereço inválido para a informação: {information}")
+        return bytes([address, bytes_size])
     
     def send_message(self, message, message_type):
         response = None
@@ -75,99 +76,105 @@ class Uart:
         return response
     
     def read_temp_value(self):
-        temp = 100 #fake value
-        round_temp = round(temp, 2)
+        with self.uart_lock: 
+            temp = 100 #fake value
+            round_temp = round(temp, 2)
 
-        message = bytes([0x01, 0x23, 0xAA]) + mat_digits
-        crc = calculate_crc(message, len(message))
-        message += crc
+            message = bytes([0x01, 0x23, 0xAA]) + mat_digits
+            crc = calculate_crc(message, len(message))
+            message += crc
 
-        response = self.send_message(message, "ler_temperatura")
+            response = self.send_message(message, "ler_temperatura")
 
-        crc_status = self.crc_validate(response, len(response))
+            crc_status = self.crc_validate(response, len(response))
 
-        if crc_status:
-            temp_value = struct.unpack(">f", response[3:7])[0]
-            print(f"Temperatura do motor lida: {temp_value}")
-            return temp_value
-        else:
-            print("Erro no CRC (Leitura de valor de temperatura do motor)")
+            if crc_status:
+                temp_value = struct.unpack(">f", response[3:7])[0]
+                print(f"Temperatura do motor lida: {temp_value}")
+                return temp_value
+            else:
+                print("Erro no CRC (Leitura de valor de temperatura do motor)")
 
-    def read_registers_byte(self, information):
-        message = bytes([0x01, 0x03]) + self.get_address(information, 1) + mat_digits
-        crc = calculate_crc(message, len(message))
-        message += crc
+        def read_registers_byte(self, information):
+            message = bytes([0x01, 0x03]) + self.get_address(information, 1) + mat_digits
+            crc = calculate_crc(message, len(message))
+            message += crc
 
-        response = self.send_message(message, "ler_registrador")
-        crc_status = self.crc_validate(response, len(response))
+            response = self.send_message(message, "ler_registrador")
+            crc_status = self.crc_validate(response, len(response))
 
-        if crc_status:
-            register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
-            return register_value
-        else:
-            return print("Erro no CRC (Leitura registradores Float)")
-        
+            if crc_status:
+                register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
+                return register_value
+            else:
+                return print("Erro no CRC (Leitura registradores Float)")
+            
     def read_registers_float(self, information):
-        message = bytes([0x01, 0x03]) + self.get_address(information, 4) + mat_digits
-        crc = calculate_crc(message, len(message))
-        message += crc
+        with self.uart_lock: 
+            message = bytes([0x01, 0x03]) + self.get_address(information, 4) + mat_digits
+            crc = calculate_crc(message, len(message))
+            message += crc
 
-        response = self.send_message(message, "ler_registrador")
-        crc_status = self.crc_validate(response, len(response))
+            response = self.send_message(message, "ler_registrador")
+            crc_status = self.crc_validate(response, len(response))
 
-        if crc_status:
-            float_bytes = response[3:7]
+            if crc_status:
+                float_bytes = response[3:7]
 
-            float_value = struct.unpack('>f', float_bytes)[0]
-            return float_value
-        else:
-            return print("Erro no CRC (Leitura registradores Float)")
+                float_value = struct.unpack('>f', float_bytes)[0]
+                return float_value
+            else:
+                return print("Erro no CRC (Leitura registradores Float)")
         
     def write_registers_byte(self, information, data):
-        message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
-        crc = calculate_crc(message, len(message))
-        message += crc
+        with self.uart_lock: 
+            message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
+            crc = calculate_crc(message, len(message))
+            message += crc
 
-        response = self.send_message(message, "escrever_byte_registrador")
+            response = self.send_message(message, "escrever_byte_registrador")
 
-        crc_status = self.crc_validate(response, len(response))
+            crc_status = self.crc_validate(response, len(response))
 
-        if crc_status:
-            register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
-            print(f"Valor do registrador (byte): {register_value}")
-            return register_value
-        else:
-            return print("Erro no CRC (Escrita registrador byte)")
+            if crc_status:
+                register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
+                print(f"Valor do registrador (byte): {register_value}")
+                return register_value
+            else:
+                return print("Erro no CRC (Escrita registrador byte)")
         
     def write_registers_float(self, information, data):
-        float_bytes = struct.pack('<f', data)
-        message = bytes([0x01, 0x06]) + self.get_address(information, 4) + float_bytes + mat_digits
-        crc = calculate_crc(message, len(message))
+        with self.uart_lock: 
+            float_bytes = struct.pack('<f', data)
+            message = bytes([0x01, 0x06]) + self.get_address(information, 4) + float_bytes + mat_digits
+            crc = calculate_crc(message, len(message))
+            message += crc
 
-        response = self.send_message(message, "escrever_float_registrador")
+            response = self.send_message(message, "escrever_float_registrador")
 
-        crc_status = self.crc_validate(response, len(response))
+            crc_status = self.crc_validate(response, len(response))
 
-        if crc_status:
-            float_bytes_response = response[3:7]
+            if crc_status:
+                float_bytes_response = response[3:7]
 
-            float_value_response = struct.unpack('>f', float_bytes_response)
-            return float_value_response
-        else:
-            return print("Erro no CRC (Escrita registrador float)")
+                float_value_response = struct.unpack('>f', float_bytes_response)
+                return float_value_response
+            else:
+                return print("Erro no CRC (Escrita registrador float)")
 
     def blink_signal_pannel(self):
         while (self.seta_esq_active) or (self.seta_dir_active):
-            if self.seta_esq_active:
-                self.write_registers_byte("seta_esq", 1)
-                time.sleep(0.5)
-                self.write_registers_byte("seta_esq", 0)
-                time.sleep(0.5)
-            elif self.seta_dir_active:
-                self.write_registers_byte("seta_dir", 1)
-                time.sleep(0.5)
-                self.write_registers_byte("set_dir", 0)
-                time.sleep(0.5)
+            with self.uart_lock:
+                if self.seta_esq_active:
+                    self.write_registers_byte("seta_esq", 1)
+                    time.sleep(0.5)
+                    self.write_registers_byte("seta_esq", 0)
+                    time.sleep(0.5)
+                elif self.seta_dir_active:
+                    self.write_registers_byte("seta_dir", 1)
+                    time.sleep(0.5)
+                    self.write_registers_byte("seta_dir", 0)
+                    time.sleep(0.5)
 
     def left_signal_blink_pannel(self):
         if not self.seta_esq_active:
