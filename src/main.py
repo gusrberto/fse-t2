@@ -17,7 +17,7 @@ uart_lock = threading.Lock()
 uart = Uart(lock=uart_lock)
 
 # Tempo de loop
-sampling_period = 0.05
+sampling_period = 1
 
 # Variáveis globais
 running = True
@@ -116,6 +116,19 @@ def calibrate_system(vehicle_control, hall_sensors):
             print("Erro: Nenhum sinal dos sensores de roda!")
             success = False
 
+        # Inicializando entradas da uart como 0
+        uart.write_registers_byte("seta", 0)
+        uart.write_registers_byte("cruise_control", 0)
+        uart.write_registers_byte("farol", 0)
+        uart.write_registers_byte("velocidade", 0)
+        uart.write_registers_byte("rotacao_motor", 0)
+        uart.write_registers_byte("seta_esq", 0)
+        uart.write_registers_byte("seta_dir", 0)
+        uart.write_registers_byte("farol_alto", 0)
+        uart.write_registers_byte("farol_baixo", 0)
+
+        print("Entradas da UART inicializadas com 0")
+
     except Exception as e:
         print(f"Erro durante a calibração: {e}")
         success = False
@@ -183,7 +196,7 @@ def uart_listener():
 
         except Exception as e:
             print(f"Erro na função UART Listener: {e}")
-        time.sleep(0.05) # 50ms
+        time.sleep(1) # 50ms
 
 def close():
     global running, routine_thread, uart_thread

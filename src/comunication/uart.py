@@ -188,25 +188,29 @@ class Uart:
     def left_signal_blink_pannel(self):
         if not self.seta_esq_active:
             self.seta_esq_active = True
-            self.seta_esq_thread = threading.Thread(target=self.blink_signal_pannel)
-            self.seta_esq_thread.start()
+            if self.seta_esq_thread is None or not self.seta_esq_thread.is_alive():
+                self.seta_esq_thread = threading.Thread(target=self.blink_signal_pannel)
+                self.seta_esq_thread.start()
 
     def left_signal_off_panel(self):
         if self.seta_esq_active:
             self.seta_esq_active = False
             self.seta_esq_thread.join()
             self.seta_esq_thread = None
-            self.write_registers_byte("seta_esq", 0)
+            with self.uart_lock:
+                self.write_registers_byte("seta_esq", 0)
 
     def right_signal_blink_pannel(self):
         if not self.seta_dir_active:
             self.seta_dir_active = True
-            self.seta_dir_thread = threading.Thread(target=self.blink_signal_pannel)
-            self.seta_dir_thread.start()
+            if self.seta_dir_thread is None or not self.seta_dir_thread.is_alive():
+                self.seta_dir_thread = threading.Thread(target=self.blink_signal_pannel)
+                self.seta_dir_thread.start()
 
     def right_signal_off_panel(self):
         if self.seta_dir_active:
             self.seta_dir_active = False
             self.seta_dir_thread.join()
             self.seta_dir_thread = None
-            self.write_registers_byte("seta_dir", 0)           
+            with self.uart_lock:
+                self.write_registers_byte("seta_dir", 0)           
