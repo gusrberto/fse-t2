@@ -61,6 +61,7 @@ class Uart:
     
     def send_message(self, message, message_type):
         response = None
+        print("antes do self uart lock")
         with self.uart_lock:
             print("No send_message antes de escrever")
             self.serial.write(message)
