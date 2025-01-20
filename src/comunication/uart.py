@@ -139,7 +139,7 @@ class Uart:
             message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
             crc = calculate_crc(message, len(message))
             message += crc
-
+            print(message)
             response = self.send_message(message, "escrever_byte_registrador")
 
             crc_status = self.crc_validate(response, len(response))
