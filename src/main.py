@@ -9,7 +9,7 @@ import time
 import threading
 
 # Tempo de loop
-sampling_period = 0.05
+sampling_period = 0.5
 
 # Variáveis globais
 running_event = threading.Event()
@@ -198,7 +198,7 @@ def uart_listener():
             uart.read_temp_value()
         except Exception as e:
             print(f"Erro na função UART Listener: {e}")
-        time.sleep(0.05) # 50ms
+        time.sleep(0.08)
 
 def close():
     global routine_thread, uart_thread
