@@ -84,7 +84,7 @@ def routine():
         if cruise_control_mode == False:
             target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
 
-        print(f"Modo Cruise Control: {cruise_control_mode}")
+        #print(f"Modo Cruise Control: {cruise_control_mode}")
 
         if abs(current_speed - target_speed) < 0.5:
             target_speed = current_speed
@@ -101,9 +101,11 @@ def routine():
         engine_rpm = hall_sensors.get_engine_rpm()
 
         # 8. Log para depuração
-        print(f"Target Speed: {target_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, PID Control Signal: {pid_control_signal:.2f}")
-        print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
-        print(f"Current Speed: {current_speed}")
+        #print(f"Target Speed: {target_speed:.2f} km/h, Measured Speed: {measured_speed:.2f} km/h, PID Control Signal: {pid_control_signal:.2f}")
+        #print(f"Engine RPM: {hall_sensors.get_engine_rpm()}")
+        #print(f"Current Speed: {current_speed}")
+        print(f"PID Control Signal: {pid_control_signal:.2f}")
+        print(f"Measured Speed: {measured_speed:.2f} km/h")
 
         time.sleep(sampling_period)
 

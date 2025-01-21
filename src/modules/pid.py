@@ -1,5 +1,5 @@
 class PID:
-    def __init__(self, kp=0.3, ki=0.1, kd=0.05, T=0.1):
+    def __init__(self, kp=1.0, ki=0.2, kd=0.1, T=0.1):
         #kp=0.009, ki=0.04, kd=0.011, T=0.2
         #kp=0.5, ki=0.05, kd=40.0, T=0.2
         self.reference, self.measured_output, self.control_signal = 0.0, 0.0, 0.0

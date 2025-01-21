@@ -52,7 +52,7 @@ class HallSensors:
 
         velocity_kmh = velocity_ps * wheel_circumference * 3.6
 
-        print(f"Velocidade Roda: {velocity_kmh} km/h") # Em pulsos/s
+        #print(f"Velocidade Roda: {velocity_kmh} km/h") # Em pulsos/s
 
         self.velocity_buffer.append(velocity_kmh)
         if len(self.velocity_buffer) > 5:
