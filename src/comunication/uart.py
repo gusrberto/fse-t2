@@ -50,7 +50,7 @@ class Uart:
         if len(buffer) < crc_size:
             return False
         crc_buffer = buffer[-crc_size:]
-        crc = calculate_crc(buffer[:-crc_size], buffer_size - crc_size).to_bytes(crc_size, 'little')
+        crc = calculate_crc(buffer[:-crc_size], buffer_size - crc_size)
         return crc_buffer == crc
     
     def get_address(self, information, bytes_size):
