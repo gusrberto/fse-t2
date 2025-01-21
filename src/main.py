@@ -84,6 +84,8 @@ def routine():
         if cruise_control_mode == False:
             target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
 
+        print(f"Modo Cruise Control: {cruise_control_mode}")
+
         engine_pid.refresh_reference(target_speed)
 
         measured_speed = hall_sensors.compute_wheel_velocity()
