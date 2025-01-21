@@ -147,7 +147,7 @@ def uart_listener():
         try:
             # Controle Farol Alto e Baixo
             lights_button = uart.read_registers_byte("farol")
-            print(f"Valor do botao do farol: {lights_button}")
+            #print(f"Valor do botao do farol: {lights_button}")
 
             if lights_button != lights_previous_state:
                 if lights_button == 1:
@@ -166,7 +166,7 @@ def uart_listener():
 
             # Controle setas esquerda e direita
             signal_button = uart.read_registers_byte("seta")
-            print(f"Valor do botao da seta: {signal_button}")
+            #print(f"Valor do botao da seta: {signal_button}")
 
             if signal_button != signal_previous_state:
                 if signal_button == 1:
@@ -197,6 +197,8 @@ def uart_listener():
             uart.write_registers_float("velocidade", current_speed)
             uart.write_registers_float("rotacao_motor", engine_rpm)
 
+            # Temperatura do motor
+            uart.read_temp_value()
         except Exception as e:
             print(f"Erro na função UART Listener: {e}")
         time.sleep(1) # 50ms
@@ -205,11 +207,15 @@ def close():
     global routine_thread, uart_thread
     running_event.clear()
 
+    # Aguarda o término das threads
     if routine_thread is not None:
         routine_thread.join()
-
     if uart_thread is not None:
         uart_thread.join()
+    if uart.seta_esq_thread is not None:
+        uart.seta_esq_thread.join()
+    if uart.seta_dir_thread is not None:
+        uart.seta_dir_thread.join()
 
     # Desligar componentes
     uart.disconnect()
