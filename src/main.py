@@ -8,27 +8,24 @@ import RPi.GPIO as GPIO
 import time
 import threading
 
-# Inicializando modulos
-engine_pid = PID()
-hall_sensors = HallSensors()
-vehicle_control = VehicleControl(max_speed=200)
-
 # Tempo de loop
 sampling_period = 1
 
 # Variáveis globais
 running_event = threading.Event()
 running_event.set()
-#running = True
 current_speed = 0
 engine_rpm = 0
 timer = None
 routine_thread = None
 uart_thread = None
 
-# Instanciando UART
+# Inicializando modulos
 uart_lock = threading.RLock()
 uart = Uart(lock=uart_lock, event=running_event)
+engine_pid = PID()
+hall_sensors = HallSensors()
+vehicle_control = VehicleControl(max_speed=200, event=running_event)
 
 def main():
     global routine_thread, uart_thread
@@ -216,6 +213,13 @@ def close():
         uart.seta_esq_thread.join()
     if uart.seta_dir_thread is not None:
         uart.seta_dir_thread.join()
+    if vehicle_control.seta_esq_thread is not None:
+        vehicle_control.seta_esq_thread.join()
+    if vehicle_control.seta_dir_thread is not None:
+        vehicle_control.seta_dir_thread.join()
+
+    time.sleep(1)
+    print("Threads encerradas, desligando componentes...")
 
     # Desligar componentes
     uart.disconnect()

@@ -3,7 +3,10 @@ import time
 import threading
 
 class VehicleControl:
-    def __init__(self, max_speed=200):
+    def __init__(self, max_speed=200, event=None):
+        self.running_event = event
+
+        # Parâmetros de aceleração/desaceleração
         self.current_target_speed = 0
         self.max_speed = max_speed
         self.acceleration_step = 2
@@ -109,7 +112,7 @@ class VehicleControl:
         GPIO.output(self.Luz_Temp_Motor, GPIO.HIGH if motor_temp_alert else GPIO.LOW)
 
     def blink_signal(self, pin):
-        while (self.seta_esq_active and pin == self.Luz_Seta_Esq) or (self.seta_dir_active and pin == self.Luz_Seta_Dir):
+        while self.running_event.is_set() and ((self.seta_esq_active and pin == self.Luz_Seta_Esq) or (self.seta_dir_active and pin == self.Luz_Seta_Dir)):
             GPIO.output(pin, GPIO.HIGH)
             time.sleep(0.5)
             GPIO.output(pin, GPIO.LOW)
