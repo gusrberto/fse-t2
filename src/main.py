@@ -50,7 +50,7 @@ def main():
         uart_thread = threading.Thread(target=uart_listener)
         uart_thread.start()
 
-        while running:
+        while running_event.is_set():
             time.sleep(1)
     except Exception as e:
         print(f"Erro: {e}")
