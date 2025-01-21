@@ -149,8 +149,9 @@ class Uart:
             response = self.send_message(message, "escrever_byte_registrador")
             print(f"apos a reposta da uart")
             crc_status = self.crc_validate(response, len(response))
-
+            print(f"apos a checar o status do crc")
             if crc_status:
+                print(f"dentro do if crc_status")
                 register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
                 print(f"Valor do registrador (byte): {register_value}")
                 return register_value
