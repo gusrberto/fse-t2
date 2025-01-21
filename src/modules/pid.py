@@ -1,13 +1,10 @@
 class PID:
-    def __init__(self, kp=1.0, ki=0.2, kd=0.1, T=0.1):
-        #kp=0.009, ki=0.04, kd=0.011, T=0.2
-        #kp=0.5, ki=0.05, kd=40.0, T=0.2
+    def __init__(self, kp=2.0, ki=0.3, kd=0.1, T=0.05):
         self.reference, self.measured_output, self.control_signal = 0.0, 0.0, 0.0
-        self.kp = kp # Proportional Gain
-        self.ki = ki # Integral Gain
-        self.kd = kd # Derivative Gain
-        self.T = T # Sampling Period
-        self.last_time = 0
+        self.kp = kp  # Proportional Gain
+        self.ki = ki  # Integral Gain
+        self.kd = kd  # Derivative Gain
+        self.T = T  # Sampling Period
         self.total_error = 0.0
         self.previous_error = 0.0
         self.control_signal_max = 100.0
@@ -19,25 +16,30 @@ class PID:
     def controller(self, measured_output):
         error = self.reference - measured_output
 
-        self.total_error += error # integral term
+        # Integral term (acumulado de erro com saturação)
+        if abs(error) > 0.01:  # Evitar acumular erros muito pequenos
+            self.total_error += error * self.T
 
-        if self.total_error >= self.control_signal_max:
-            self.total_error = self.control_signal_max
-        elif self.total_error <= self.control_signal_min:
-            self.total_error = self.control_signal_min
+        # Evitar saturação da integral
+        self.total_error = max(
+            self.control_signal_min / (self.ki + 1e-6), 
+            min(self.control_signal_max / (self.ki + 1e-6), self.total_error)
+        )
 
-        delta_error = error - self.previous_error # derivative term
+        # Derivative term
+        delta_error = (error - self.previous_error) / self.T
 
-        self.control_signal = (self.kp * error + (self.ki * self.T) * self.total_error + (self.kd / self.T) * delta_error)
+        # PID control signal
+        self.control_signal = (
+            self.kp * error
+            + self.ki * self.total_error
+            + self.kd * delta_error
+        )
 
-        if self.control_signal >= self.control_signal_max:
-            self.control_signal = self.control_signal_max
-        elif self.control_signal <= self.control_signal_min:
-            self.control_signal = self.control_signal_min
+        # Saturação do controle
+        self.control_signal = max(self.control_signal_min, min(self.control_signal_max, self.control_signal))
 
-        if self.reference > 0:
-            self.control_signal = (self.control_signal / self.reference) * self.control_signal_max    
-
+        # Atualizar erro anterior
         self.previous_error = error
 
-        return self.control_signal 
+        return self.control_signal
