@@ -60,7 +60,7 @@ def routine():
     global current_speed, engine_rpm
     cruise_control_mode = False
     while running_event.is_set():
-        cruise_control_register = uart.read_registers_byte("cruise_control", 1)
+        cruise_control_register = uart.read_registers_byte("cruise_control")
 
         pedal_ac = vehicle_control.read_accelerator_pedal()
         pedal_fr = vehicle_control.read_brake_pedal()
