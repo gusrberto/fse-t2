@@ -117,11 +117,8 @@ def calibrate_system(vehicle_control, hall_sensors):
             success = False
 
         # Inicializando entradas da uart como 0
-        print("Limpa seta")
         uart.write_registers_byte("seta", 0)
-        print("Limpa cc")
         uart.write_registers_byte("cruise_control", 0)
-        print("Limpa farol")
         uart.write_registers_byte("farol", 0)
         uart.write_registers_float("velocidade", 0)
         uart.write_registers_float("rotacao_motor", 0)

@@ -138,22 +138,14 @@ class Uart:
         
     def write_registers_byte(self, information, data):
         with self.uart_lock: 
-            print(f"write registers byte")
             message = bytes([0x01, 0x06]) + self.get_address(information, 1) + bytes([data]) + mat_digits
-            #print(message)
             crc = calculate_crc(message, len(message))
-            print(f"message antes do incremento {message}")
             message += crc
-            print(f"message depois do incremento {message}")
             
             response = self.send_message(message, "escrever_byte_registrador")
-            print(f"apos a reposta da uart")
             crc_status = self.crc_validate(response, len(response))
-            print(f"apos a checar o status do crc")
             if crc_status:
-                print(f"dentro do if crc_status")
                 register_value = int.from_bytes(response[2:3], byteorder='big', signed=False)
-                print(f"Valor do registrador (byte): {register_value}")
                 return register_value
             else:
                 return print("Erro no CRC (Escrita registrador byte)")
