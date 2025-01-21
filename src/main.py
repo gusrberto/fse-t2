@@ -9,7 +9,7 @@ import time
 import threading
 
 # Tempo de loop
-sampling_period = 0.5
+sampling_period = 0.3
 
 # Variáveis globais
 running_event = threading.Event()
@@ -58,14 +58,31 @@ def main():
 
 def routine():
     global current_speed, engine_rpm
-
+    cruise_control_mode = False
     while running_event.is_set():
+        cruise_control_register = uart.read_registers_byte("cruise_control", 1)
+
         pedal_ac = vehicle_control.read_accelerator_pedal()
         pedal_fr = vehicle_control.read_brake_pedal()
 
-        print(f"Acelerador: {pedal_ac} | Freio: {pedal_fr}")
+        if cruise_control_register == 1 and not pedal_ac and not pedal_fr:
+            cruise_control_mode = True
+            target_speed = current_speed
+            uart.write_registers_byte("cruise_control", 0)
+        elif cruise_control_register == 4 and not pedal_ac and not pedal_fr:
+            cruise_control_mode = True
+            target_speed = current_speed + 1
+            uart.write_registers_byte("cruise_control", 0)
+        elif cruise_control_register == 10 and not pedal_ac and not pedal_fr:
+            cruise_control_mode = True
+            target_speed = current_speed - 1
+            uart.write_registers_byte("cruise_control", 0)
 
-        target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
+        if cruise_control_mode and (pedal_ac or pedal_fr):
+            cruise_control_mode = False
+
+        if cruise_control_mode == False:
+            target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
 
         engine_pid.refresh_reference(target_speed)
 

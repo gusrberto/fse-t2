@@ -25,5 +25,5 @@ pip install -r requirements.txt
 1. Rode o projeto a partir diretório raiz:
 
 ```sh
-python3 -m src.main
+python -m src.main
 ```
