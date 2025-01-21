@@ -1,5 +1,5 @@
 class PID:
-    def __init__(self, kp=2.0, ki=0.3, kd=0.1, T=0.05):
+    def __init__(self, kp=2.0, ki=0.3, kd=0.1, T=0.2):
         self.reference, self.measured_output, self.control_signal = 0.0, 0.0, 0.0
         self.kp = kp  # Proportional Gain
         self.ki = ki  # Integral Gain
