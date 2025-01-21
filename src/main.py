@@ -61,7 +61,7 @@ def routine():
     cruise_control_mode = False
     while running_event.is_set():
         cruise_control_register = uart.read_registers_byte("cruise_control")
-
+        vehicle_control.brake_pwm.ChangeDutyCycle(0)
         pedal_ac = vehicle_control.read_accelerator_pedal()
         pedal_fr = vehicle_control.read_brake_pedal()
 
