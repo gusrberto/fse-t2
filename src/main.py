@@ -13,19 +13,22 @@ engine_pid = PID()
 hall_sensors = HallSensors()
 vehicle_control = VehicleControl(max_speed=200)
 
-uart_lock = threading.RLock()
-uart = Uart(lock=uart_lock)
-
 # Tempo de loop
 sampling_period = 1
 
 # Variáveis globais
-running = True
+running_event = threading.Event()
+running_event.set()
+#running = True
 current_speed = 0
 engine_rpm = 0
 timer = None
 routine_thread = None
 uart_thread = None
+
+# Instanciando UART
+uart_lock = threading.RLock()
+uart = Uart(lock=uart_lock, event=running_event)
 
 def main():
     global routine_thread, uart_thread
@@ -59,7 +62,7 @@ def main():
 def routine():
     global current_speed, engine_rpm
 
-    while running:
+    while running_event.is_set():
         pedal_ac = vehicle_control.read_accelerator_pedal()
         pedal_fr = vehicle_control.read_brake_pedal()
 
@@ -140,7 +143,7 @@ def uart_listener():
     signal_previous_state = None
     lights_previous_state = None
 
-    while running:
+    while running_event.is_set():
         try:
             # Controle Farol Alto e Baixo
             lights_button = uart.read_registers_byte("farol")
@@ -199,8 +202,8 @@ def uart_listener():
         time.sleep(1) # 50ms
 
 def close():
-    global running, routine_thread, uart_thread
-    running = False
+    global routine_thread, uart_thread
+    running_event.clear()
 
     if routine_thread is not None:
         routine_thread.join()

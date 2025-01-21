@@ -19,7 +19,7 @@ address_table = {
 }
 
 class Uart:
-    def __init__(self, lock=None):
+    def __init__(self, lock=None, event=None):
         self.serial = serial.Serial(port="/dev/serial0",
                                     baudrate=115200,
                                     parity=serial.PARITY_NONE,
@@ -30,6 +30,7 @@ class Uart:
         self.serial.close()
         
         self.uart_lock = lock
+        self.running_event = event
         self.seta_esq_active = False
         self.seta_dir_active = False
         self.seta_esq_thread = None
@@ -172,7 +173,7 @@ class Uart:
                 return print("Erro no CRC (Escrita registrador float)")
 
     def blink_signal_pannel(self):
-        while (self.seta_esq_active) or (self.seta_dir_active):
+        while self.running_event.is_set() and (self.seta_esq_active or self.seta_dir_active):
             with self.uart_lock:
                 if self.seta_esq_active:
                     self.write_registers_byte("seta_esq", 1)
