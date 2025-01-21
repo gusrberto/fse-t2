@@ -86,6 +86,9 @@ def routine():
 
         print(f"Modo Cruise Control: {cruise_control_mode}")
 
+        if abs(current_speed - target_speed) < 0.5:
+            target_speed = current_speed
+
         engine_pid.refresh_reference(target_speed)
 
         measured_speed = hall_sensors.compute_wheel_velocity()

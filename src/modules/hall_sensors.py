@@ -24,6 +24,8 @@ class HallSensors:
         self.wheel_diameter = 0.63
         self.wheel_circumference = self.wheel_diameter * 3.1416
 
+        self.velocity_buffer = []
+
         GPIO.add_event_detect(self.Sensor_hall_motor, GPIO.RISING, callback=self.read_engine_encoder, bouncetime=1)
         GPIO.add_event_detect(self.Sensor_hall_roda_A, GPIO.RISING, callback=self.read_wheel_encoder, bouncetime=1)
 
@@ -52,7 +54,11 @@ class HallSensors:
 
         print(f"Velocidade Roda: {velocity_kmh} km/h") # Em pulsos/s
 
-        return velocity_kmh
+        self.velocity_buffer.append(velocity_kmh)
+        if len(self.velocity_buffer) > 5:
+            self.velocity_buffer.pop(0)
+
+        return sum(self.velocity_buffer) / len(self.velocity_buffer)
 
     def read_engine_encoder(self, channel):
         self.engine_pulse_count += 1
