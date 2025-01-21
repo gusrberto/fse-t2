@@ -65,7 +65,7 @@ def routine():
         pedal_ac = vehicle_control.read_accelerator_pedal()
         pedal_fr = vehicle_control.read_brake_pedal()
 
-        if cruise_control_register == 1 and not pedal_ac and not pedal_fr:
+        """   if cruise_control_register == 1 and not pedal_ac and not pedal_fr:
             cruise_control_mode = True
             target_speed = current_speed
             uart.write_registers_byte("cruise_control", 0)
@@ -79,7 +79,7 @@ def routine():
             uart.write_registers_byte("cruise_control", 0)
 
         if cruise_control_mode and (pedal_ac or pedal_fr):
-            cruise_control_mode = False
+            cruise_control_mode = False """
 
         if cruise_control_mode == False:
             target_speed = vehicle_control.calculate_target_speed(pedal_ac, pedal_fr)
