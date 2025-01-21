@@ -8,7 +8,6 @@ https://github.com/FGA-FSE/trabalho-2-simulador-de-carro-trabalho-2-fse-gustavo-
 ```sh
 python -m venv env
 ``` 
-*O nome está como "myvenv" por causa do .gitignore
 
 3. Ative o ambiente virtual
 ```sh
